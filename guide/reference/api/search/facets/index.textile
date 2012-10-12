@@ -7,15 +7,27 @@ sidebar: reference_api_search_facets
 
 The usual purpose of a full-text search engine is to return a small number of documents matching your query.
 
+全文搜索引擎的基本目的是返回少量你想查询的文档。
+
 _Facets_ provide aggregated data based on a search query. In the simplest case, a "terms facet":/guide/reference/api/search/facets/terms-facet.html can return _facet counts_ for various _facet values_ for a specific _field_. ElasticSearch supports more facet implementations, such as "statistical":/guide/reference/api/search/facets/statistical-facet.html or "date histogram":/guide/reference/api/search/facets/date-histogram-facet.html facets.
+
+_Facets_ 基于搜索Query提供聚合信息。 举个简单的例子， 一个 "terms facet":/guide/reference/api/search/facets/terms-facet.html 对指定的 _field_ 返回 不同_fact值_ 的 _facet数目_ 。ElasticSearch提供更多的Facet实现， 比如 "statistical":/guide/reference/api/search/facets/statistical-facet.html 和 "日期直方图（date histogram）":/guide/reference/api/search/facets/date-histogram-facet.html 。
 
 The field used for facet calculations _must_ be of type numeric, date/time or be analyzed as a single token &mdash; see the "_Mapping_":/guide/reference/mapping/index.html guide for details on the analysis process.
 
+用来Facet计算的字段 _必须_ 是数值类型(numberic)、日期类型(date/time)或可以被分析（Analyzed）为单Token &mdash; 参见 "_Mapping_":/guide/reference/mapping/index.html 向导，了解详细的分析流程(analysis process)。
+
 You can give the facet a custom _name_ and return multiple facets in one request.
+
+你可以为Facet自定义 _名称_ ，并且在一个请求中返回多个Facets。
 
 Let's try it out with a simple example. Suppose we have a number of articles with a field called @tags@, preferably analyzed with the "keyword":/guide/reference/index-modules/analysis/keyword-analyzer.html analyzer. The facet aggregation will return counts for the most popular tags across the documents matching your query &mdash; or across all documents in the index.
 
+来试试一个简单的样例。 假设我们有一组拥有 @tags@ 字段的文章，分析器采用 "keyword":/guide/reference/index-modules/analysis/keyword-analyzer.html 。Facet聚合将会返回匹配查询的文档（或所有文档）中最流行Tag的数目。
+
 We will store some example data first:
+
+首先，我们存储了如下样例数据
 
 <pre class="prettyprint lang-bash">
 curl -X DELETE "http://localhost:9200/articles"
@@ -25,6 +37,8 @@ curl -X POST "http://localhost:9200/articles/article" -d '{"title" : "Three", "t
 </pre>
 
 Now, let's query the index for articles beginning with letter “T” and retrieve a "_terms facet_":/guide/reference/api/search/facets/terms-facet.html for the @tags@ field. We will name the facet simply: _tags_.
+
+现在，我们查询以字母"T"开头的文档，并对 @tasgs@ 计算 "_terms facet_":/guide/reference/api/search/facets/terms-facet.html 。 我们将简单地对此Facet命名为 _tags_ 。
 
 <pre class="prettyprint lang-bash">
 curl -X POST "http://localhost:9200/articles/_search?pretty=true" -d '
@@ -38,6 +52,8 @@ curl -X POST "http://localhost:9200/articles/_search?pretty=true" -d '
 </pre>
 
 This request will return articles “Two” and “Three” (because they match our query), as well as the @tags@ facet:
+
+请求将会返回文档“Two”和“Three”（因为它们匹配我们的查询），同时还有如下Facet：
 
 <pre class="prettyprint lang-js">
 "facets" : {
@@ -62,17 +78,29 @@ This request will return articles “Two” and “Three” (because they match 
 
 In the @terms@ array, relevant _terms_ and _counts_ are returned. You'll probably want to display these to your users. The facet also returns the number of documents which have no value for the field (@missing@), the number of facet values not included in the returned facets (@other@), and the total number of tokens in the facet (@total@).
 
+在 @terms@ 数组中，返回了 _terms_ 和 _counts_ 。 你或许想将它们展示给用户。 此Facet同样返回了没有指定字段的文档数目（ @missing@ ）、没有包含在返回的Facets中的Facet值的数目(@others@)、Facet中Token的总数(@total@)。
+
 Notice, that the counts are scoped to the current query: _foo_ is counted only twice (not three times), _bar_ is counted twice and _baz_ once.
+
+注意，这里的“数目”仅限制于当前的查询： _foo_ 只计算了两次（而不是三次）, _bar_ 计算了两次，而 _baz_ 则只有一次。
 
 That's because the primary purpose of facets is to enable "_faceted navigation_":http://en.wikipedia.org/wiki/Faceted_search, allowing the user to refine her query based on the insight from the facet, i.e. restrict the search to a specific category, price or date range. See the example of faceted navigation at _LinkedIn_ below:
 
 !/guide/images/linkedin-faceted-search.png(Faceted Search at LinkedIn)!
 
+这是因为，Facet的主要目的是提供 "_faceted navigation_":http://en.wikipedia.org/wiki/Faceted_search, 方便用户可以基于Facet来重新查询数据，也就是说将搜索限制在制定的类别、价格和日期范围中。 参见下面 _LinkedIn_ 的快速导航（faceted navigation）：
+
+!/guide/images/linkedin-faceted-search.png(Faceted Search at LinkedIn)!
+
 Facets can be used, however, for other purposes: computing histograms, statistical aggregations, and more. See the article about "data visualization":/blog/2011/05/13/data-visualization-with-elasticsearch-and-protovis.html on the ElasticSearch's blog for inspiration.
+
+然而，Facets也可以用于别的用途：计算直方图、聚合统计等等。 可以参考 ElasticSearch上的博客 "data visualization":/blog/2011/05/13/data-visualization-with-elasticsearch-and-protovis.html.
 
 h2. Scope
 
 As we have already mentioned, facet computation is restricted to the scope of the current query, called @main@, by default. Facets can be computed within the @global@ scope as well, in which case it will return values computed across all documents in the index:
+
+我们已经提到，Facet计算是限制在当前搜索的作用域（默认叫做 @main@ ）里的。Facets同样也可以在 @global@ 作用域下计算，这样我们覆盖所有的文档。
 
 <pre class="prettyprint lang-js">
 {
@@ -87,11 +115,18 @@ As we have already mentioned, facet computation is restricted to the scope of th
 
 There's one **important distinction** to keep in mind. While search _queries_ restrict both the returned documents and facet counts, search _filters_ restrict only returned documents &mdash; but _not_ facet counts.
 
+有一点需要 **特别注意** 。当搜索 _条件_ 约束了返回的文档和Facets， 搜索 _过滤器_ 只会对返回的文档进行处理 &mdash; 而 _不_ 是Facets。也即，在搜索条件上，启用了搜索过滤器后，只会影响到返回的文档，而不会影响Facets。
+
 If you need to restrict both the documents and facets, and you're not willing or able to use a query, you may use a _facet filter_.
+
+如果需要同时处理文档和Facets，并且你不希望或者不能使用Query来实现，可以选择使用 _Facet Filter_ 。
+
 
 h2. Facet Filter
 
 All facets can be configured with an additional filter (explained in the "Query DSL":/guide/reference/query-dsl section), which _will_ reduce the documents they use for computing results. An example with a _term_ filter:
+
+所有的Facet都可以配置一个额外的过滤器 (参见 "Query DSL":/guide/reference/query-dsl section) 。这个过滤器将会删减用来计算Facet结果的文档。 下面是一个使用了 _term_ 过滤器的样例：
 
 <pre class="prettyprint lang-js">
 {
@@ -109,6 +144,8 @@ All facets can be configured with an additional filter (explained in the "Query 
 </pre>
 
 Note that this is different from a facet of the "filter":/guide/reference/api/search/facets/filter-facet.html type.
+
+注意，Facet Filter与 "Filter Facet":/guide/reference/api/search/facets/filter-facet.html 不同。 Filter Facet是计算文档中满足Filter的数目。
 
 h2. Facets with the _nested_ types
 
