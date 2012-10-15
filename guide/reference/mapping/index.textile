@@ -7,15 +7,25 @@ sidebar: reference_mapping
 
 p. Mapping is the process of defining how a document should be mapped to the Search Engine, including its searchable characteristics such as which fields are searchable and if/how they are tokenized. In ElasticSearch, an index may store documents of different "mapping types". ElasticSearch allows one to associate multiple mapping definitions for each mapping type.
 
+p. Mapping阶段定义了文档（包括待搜索特征）是如何被映射到搜索引擎的，如可以搜索哪些字段，这些字段是否/如何被分词的。在ElasticSearch中， 一个索引可能存储了不同"mapping types"的文档。ElasticSearch允许每个 *索引*对每个*映射类型*关联多个*映射定义*。
+
 p. Explicit mapping is defined on an index/type level. By default, there isn't a need to define an explicit mapping, since one is automatically created and registered when a new type or new field is introduced (with no performance overhead) and have sensible defaults. Only when the defaults need to be overridden must a mapping definition be provided.
+
+p. 在Index/Type级别时，需要明确定义Mapping。 默认是不需要定义Mapping，因为当遇到新的Type或新的字段，会自动创建并注册一个明确的Mapping（此过程无性能损耗）。如果需要覆盖默认Mapping，你需要明确定义Mapping（译注：这不显而易见嘛~）。
 
 h2. Mapping Types
 
 p. Mapping types are a way to try and divide the documents indexed into the same index into logical groups. Think of it as tables in a database. Though there is separation between types, it's not a full separation (all end up as a document within the same Lucene index).
 
+p. Mapping Types可以用来决定同一索引中的文档如何被划分到逻辑组。可以认为它是Database中的Table。虽然看上去Type直接存在差异，但其实他们的最终形式都是Lucene索引的的文档。
+
 p. Field names with the same name across types are highly recommended to have the same type and same mapping characteristics (analysis settings for example). There is an effort to allow to explicitly "choose" which field to use by using type prefix (@my_type.my_field@), but it's not complete, and there are places where it will never work (like faceting on the field).
 
+p. 在不同Mapping Type中拥有相同的名称的字段，最好拥有相同的字段类型和相同的映射特征（例如analysis设置）。 尽管我们尽可能地允许通过Type前缀 (@my_type.my_field@)去明确地“选择”何字段，但这不是完美的，在有些地方将会失效（如基于字段的Facet）。
+
 p. In practice though, this restriction is almost never an issue. The field name usually ends up being a good indication to its "typeness" (e.g. "first_name" will always be a string). Note also, that this does not apply to the cross index case.
+
+p. 虽然在练习中，这些限制几乎不是问题。字段名称通常很好地指示了它的"typeness"（比如，“姓名”将总会是个string类型）。 需要注意，这些情况并不适用于跨索引的案例（也即索引与索引之间是独立的）。
 
 h2. Mapping API
 

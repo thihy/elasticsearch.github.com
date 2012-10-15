@@ -7,7 +7,11 @@ sidebar: reference_mapping
 
 p. Each JSON field can be mapped to a specific core type. JSON itself already provides us with some typing, with its support for @string@, @integer@/@long@, @float@/@double@, @boolean@, and @null@.
 
+p. 每个JSON字段能被映射到指定的核心类型。 JSON本身已经提供了一些类型：@string@, @integer@/@long@, @float@/@double@, @boolean@, 和 @null@。
+
 p. The following sample tweet JSON document will be used to explain the core types:
+
+p. 下面的Tweet样例JSON文档将会用来解释核心类型：
 
 <pre class="prettyprint lang-js">
 {
@@ -22,6 +26,8 @@ p. The following sample tweet JSON document will be used to explain the core typ
 </pre>
 
 p. Explicit mapping for the above JSON tweet can be:
+
+p. 上面的JSON Tweet将会有如下的映射：
 
 <pre class="prettyprint lang-js">
 {
@@ -42,6 +48,8 @@ h1. String
 
 p. The text based string type is the most basic type, and contains one or more characters. An example mapping can be:
 
+p. String类型的文本是最基本的类型，它包括一个或多个字符。下面是一个样例映射：
+
 <pre class="prettyprint lang-js">
 {
     "tweet" : {
@@ -59,7 +67,11 @@ p. The text based string type is the most basic type, and contains one or more c
 
 p. The above mapping defines a @string@ @message@ property/field within the @tweet@ type. The field is stored in the index (so it can later be retrieved using selective loading when searching), and it gets analyzed (broken down into searchable terms). If the message has a @null@ value, then then value that will be stored is @na@.
 
+p. 上面的映射定义了一个@string@ @message@属性/字段。这个字段将会存储在索引中（所以以后搜索时可以被检索出来），并且它将会被分析（分割成可所有的词元）。如果message是@null@，那么它将会作为@na@存储。
+
 p. The following table lists all the attributes that can be used with the @string@ type:
+
+p. 下面的表格列出了@string@类型的所有属性：
 
 |_. Attribute |_. Description |
 |@index_name@|The name of the field that will be stored in the index. Defaults to the property/field name.|
@@ -75,6 +87,11 @@ p. The following table lists all the attributes that can be used with the @strin
 |@search_analyzer@|The analyzer used to analyze the field when part of a query string.|
 |@include_in_all@|Should the field be included in the @_all@ field (if enabled). Defaults to @true@ or to the parent @object@ type setting.|
 |@ignore_above@|Set to a size where above the mentioned size the string will be ignored. Handly for generic @not_analyzed@ fields that should ignore long text. (since @0.19.9).|
+
+|_. 属性 |_. 类型 |_. 默认值 |_. 描述 |
+|@index_name@|string|JSON中的属性/字段名称|存储在索引中的字段名称。|
+|@store@|@yes@/@no@|@no@|@yes@将会在索引中存储此字段。@no@则不会存储。|
+|@index@|@analyzed@/@not_analyzed@/@no@|@analyzed@|@analyzed@意味着在索引和搜索时，将会对此字段进行分词。|
 
 p. The @string@ type also support custom indexing parameters associated with the indexed value. For example:
 
